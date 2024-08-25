@@ -8,6 +8,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        // Define custom theme colors here
+        primary: "rgb(111 207 151)",
+        secondary: "#14171A",
+        accent: "#657786",
+        headingBar: "#448B7B",
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
