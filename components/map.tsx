@@ -47,6 +47,7 @@ const MapLayout = ({ useStatesProps, functionHandlersProps }: any) => {
     map,
     setMap,
     myPosition,
+    restaurantList,
   } = useStatesProps;
 
   const { locateUser, handleNearbyClick, handleFindChange } =
@@ -126,12 +127,12 @@ const MapLayout = ({ useStatesProps, functionHandlersProps }: any) => {
           {/* Shops Listing  */}
           <Dropdown
             value={selectedOption}
-            options={RESTAURANTS_DATA_SET}
+            options={restaurantList}
             onChange={(e) => handleFindChange(e.value)}
             placeholder="Select Location"
             className="w-80"
             optionLabel="name"
-            optionValue="id"
+            optionValue="_id"
           />
           <div className="flex space-x-2 mx-9 ">
             <button

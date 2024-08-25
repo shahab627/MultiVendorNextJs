@@ -4,14 +4,25 @@ import Page from "./page";
 import { EARTH_RADIUS_KM, FIND_RESTAURANTS_RANGE_KM } from "@/constants/values";
 import { RESTAURANTS_DATA_SET } from "@/constants/restaurants";
 
-import { GET_RESTAURANTS } from "@/lib/graphQl/qurries";
+import { RESTAURANTS_QUERY } from "@/lib/graphQl/qurries";
 import client from "@/lib/graphqlClient";
-
+import { useQuery } from "@tanstack/react-query";
+import { json } from "stream/consumers";
+const fetchRestaurants = async (
+  latitude: number,
+  longitude: number
+): Promise<Restaurant[]> => {
+  const data: any = await client.request(RESTAURANTS_QUERY, {
+    latitude,
+    longitude,
+  });
+  return data;
+};
 const HomeContainer = () => {
   //    ********  Declarations *******
   const toast = useRef<any>(null);
   const [position, setPosition] = React.useState<Position | null>(null);
-  const [selectedOption, setSelectedOption] = React.useState<number | null>(
+  const [selectedOption, setSelectedOption] = React.useState<string | null>(
     null
   );
   const [myPosition, setMyPosition] = React.useState<any>({
@@ -24,28 +35,16 @@ const HomeContainer = () => {
   const [nearbyRestaurants, setNearbyRestaurants] = React.useState<
     Restaurant[]
   >([]);
+  const [restaurantList, setRestaurantList] = React.useState<[]>([]);
+
+  //    ********  useQuery *******
+
+  const { data, error, isLoading } = useQuery<Restaurant[], Error>({
+    queryKey: ["restaurants", myPosition.lat, myPosition.lng],
+    queryFn: () => fetchRestaurants(myPosition.lat, myPosition.lng),
+  });
 
   //    ********  useEffects *******
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [error, setError] = React.useState<string | null>(null);
-
-  const fetchRestaurants = async () => {
-    try {
-      const variables = {
-        latitude: 33.5694203,
-        longitude: 73.1232168,
-      };
-
-      const data = await client.request(GET_RESTAURANTS, variables);
-
-      // setRestaurants(data.nearByRestaurants.restaurants);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to fetch restaurants");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   React.useEffect(() => {
     // Check if Geolocation API is supported
@@ -68,11 +67,24 @@ const HomeContainer = () => {
 
     // Request the user's current position
     navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
-    fetchRestaurants();
   }, []);
+  React.useEffect(() => {
+    if (data) {
+      setRestaurantList(data?.nearByRestaurants.restaurants);
+    }
+  }, [data]);
 
   //    ********  Functions *******
+  const truncateString = (str: string, length: number): string => {
+    return str.length > length ? `${str.slice(0, length)}...` : str;
+  };
 
+  const getCategoryTitles = (categories: Category[]): string => {
+    const titles = categories.map((category) => category.title).join(", ");
+
+    // Truncate if longer than 30 characters
+    return truncateString(titles, 30);
+  };
   // Function to locate the user
   const locateUser = () => {
     if (map) {
@@ -81,8 +93,8 @@ const HomeContainer = () => {
   };
   // Function to calculate the distance between two latitude and longitude points using the Haversine formula
   function calculateDistance(
-    lat1: number,
-    lng1: number,
+    lat1: any,
+    lng1: any,
     lat2: number,
     lng2: number
   ): number {
@@ -104,44 +116,55 @@ const HomeContainer = () => {
   }
 
   // Function to handle the Find button click
-  const handleFindChange = (id: number) => {
+  const handleFindChange = (id: string) => {
     if (id) {
-      const restaurant = RESTAURANTS_DATA_SET.find((r) => r.id === id);
+      const restaurant: any = restaurantList.find(
+        (r: Restaurant) => r._id === id
+      );
       setNearbyRestaurants([]);
       setSelectedOption(id);
       if (restaurant) {
         const dist = calculateDistance(
-          restaurant.lat,
-          restaurant.lng,
+          parseFloat(restaurant.location.coordinates[0]),
+          parseFloat(restaurant.location.coordinates[1]),
           myPosition.lat,
           myPosition.lng
         );
         setSelectedRestaurant({
           name: restaurant.name,
-          location: restaurant.location,
+          location: restaurant.address,
           distance: dist,
-          lat: restaurant.lat,
-          lng: restaurant.lng,
+          lat: parseFloat(restaurant.location.coordinates[0]),
+          lng: parseFloat(restaurant.location.coordinates[1]),
         });
-        setPosition({ lat: restaurant.lat, lng: restaurant.lng });
-        map?.flyTo([restaurant.lat, restaurant.lng], map.getZoom());
+        setPosition({
+          lat: parseFloat(restaurant.location.coordinates[0]),
+          lng: parseFloat(restaurant.location.coordinates[1]),
+        });
+        map?.flyTo(
+          [
+            parseFloat(restaurant.location.coordinates[0]),
+            parseFloat(restaurant.location.coordinates[1]),
+          ],
+          map.getZoom()
+        );
       }
     }
   };
   // Function to find nearest restaurants based on a given latitude and longitude
   function findNearestRestaurants(
     currentLocation: Position,
-    restaurants: Restaurant[],
+    restaurants: any,
     maxDistanceKm: number
   ): any {
     const { lat: currentLat, lng: currentLng } = currentLocation;
     // Filter restaurants within the maximum distance
-    return restaurants.filter((restaurant) => {
+    return restaurants.filter((restaurant: any) => {
       const distance = calculateDistance(
         currentLat,
         currentLng,
-        restaurant.lat,
-        restaurant.lng
+        parseFloat(restaurant.location.coordinates[0]),
+        parseFloat(restaurant.location.coordinates[1])
       );
       return distance <= maxDistanceKm;
     });
@@ -151,14 +174,14 @@ const HomeContainer = () => {
     if (myPosition) {
       const nearest = findNearestRestaurants(
         myPosition,
-        RESTAURANTS_DATA_SET,
+        restaurantList,
         FIND_RESTAURANTS_RANGE_KM
       );
       if (nearest.length <= 0) {
         toast.current.show({
           severity: "info",
           summary: "Info",
-          detail: "No Nearest Restaurant Found",
+          detail: "No Nearest Restaurant Found within 10 Km",
         });
       } else {
         setNearbyRestaurants(nearest);
@@ -174,6 +197,7 @@ const HomeContainer = () => {
     locateUser,
     handleNearbyClick,
     handleFindChange,
+    getCategoryTitles,
   };
   const useStatesProps = {
     position,
@@ -185,11 +209,13 @@ const HomeContainer = () => {
     nearbyRestaurants,
     map,
     setMap,
+    restaurantList,
   };
   return (
     <Page
       useStatesProps={useStatesProps}
       functionHandlersProps={functionHandlersProps}
+      isLoading={isLoading}
       toast={toast}
     />
   );

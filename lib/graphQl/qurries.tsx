@@ -1,4 +1,8 @@
-export const GET_RESTAURANTS = `
+// queries/restaurantQueries.ts
+
+import { gql } from "graphql-request";
+
+export const RESTAURANTS_QUERY = gql`
   query Restaurants($latitude: Float, $longitude: Float) {
     nearByRestaurants(latitude: $latitude, longitude: $longitude) {
       restaurants {
@@ -9,6 +13,7 @@ export const GET_RESTAURANTS = `
         address
         location {
           coordinates
+          __typename
         }
         deliveryTime
         minimumOrder
@@ -18,7 +23,9 @@ export const GET_RESTAURANTS = `
           ratings
           reviews {
             _id
+            __typename
           }
+          __typename
         }
         categories {
           _id
@@ -26,7 +33,9 @@ export const GET_RESTAURANTS = `
           foods {
             _id
             title
+            __typename
           }
+          __typename
         }
         rating
         isAvailable
@@ -35,9 +44,13 @@ export const GET_RESTAURANTS = `
           times {
             startTime
             endTime
+            __typename
           }
+          __typename
         }
+        __typename
       }
+      __typename
     }
   }
 `;

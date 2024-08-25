@@ -2,6 +2,7 @@ import RestaurantCard from "@/components/restaurantCard";
 import { RESTAURANTS_DATA_SET } from "@/constants/restaurants";
 import dynamic from "next/dynamic";
 import { Toast } from "primereact/toast";
+import HomeLoading from "./loading";
 // Dynamically import the Map component with no SSR
 const MapLayout = dynamic(() => import("@/components/map"), { ssr: false });
 
@@ -9,10 +10,13 @@ export default function Home({
   useStatesProps,
   functionHandlersProps,
   toast,
+  isLoading,
 }: any) {
-  const { nearbyRestaurants } = useStatesProps;
+  const { nearbyRestaurants, restaurantList } = useStatesProps;
+  const { getCategoryTitles } = functionHandlersProps;
   return (
     <div className="bg-white w-full h-full mt-20 ">
+      {isLoading && <HomeLoading />}
       <Toast ref={toast} />
 
       <MapLayout
@@ -36,9 +40,10 @@ export default function Home({
                 {nearbyRestaurants.map(
                   (restaurant: Restaurant, index: number) => (
                     <RestaurantCard
-                      key={restaurant.id}
+                      key={restaurant._id}
                       restaurant={restaurant}
                       isDark={index % 2 === 0}
+                      getCategoryTitles={getCategoryTitles}
                     />
                   )
                 )}
@@ -55,11 +60,12 @@ export default function Home({
               </label>
             </div>
             <div className="flex mt-5 flex-wrap justify-center ">
-              {RESTAURANTS_DATA_SET.map((restaurant, index) => (
+              {restaurantList.map((restaurant: Restaurant, index: number) => (
                 <RestaurantCard
-                  key={restaurant.id}
+                  key={restaurant._id}
                   restaurant={restaurant}
                   isDark={index % 2 === 0}
+                  getCategoryTitles={getCategoryTitles}
                 />
               ))}
             </div>
