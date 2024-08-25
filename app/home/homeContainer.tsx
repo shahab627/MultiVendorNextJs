@@ -4,6 +4,9 @@ import Page from "./page";
 import { EARTH_RADIUS_KM, FIND_RESTAURANTS_RANGE_KM } from "@/constants/values";
 import { RESTAURANTS_DATA_SET } from "@/constants/restaurants";
 
+import { GET_RESTAURANTS } from "@/lib/graphQl/qurries";
+import client from "@/lib/graphqlClient";
+
 const HomeContainer = () => {
   //    ********  Declarations *******
   const toast = useRef<any>(null);
@@ -23,6 +26,26 @@ const HomeContainer = () => {
   >([]);
 
   //    ********  useEffects *******
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const fetchRestaurants = async () => {
+    try {
+      const variables = {
+        latitude: 33.5694203,
+        longitude: 73.1232168,
+      };
+
+      const data = await client.request(GET_RESTAURANTS, variables);
+
+      // setRestaurants(data.nearByRestaurants.restaurants);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to fetch restaurants");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   React.useEffect(() => {
     // Check if Geolocation API is supported
@@ -45,6 +68,7 @@ const HomeContainer = () => {
 
     // Request the user's current position
     navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+    fetchRestaurants();
   }, []);
 
   //    ********  Functions *******

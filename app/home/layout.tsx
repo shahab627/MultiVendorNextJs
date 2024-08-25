@@ -4,6 +4,7 @@ import HomeLoading from "./loading";
 import Navbar from "@/components/navbar";
 import HomeContainer from "./homeContainer";
 
+
 const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({
@@ -12,6 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    
     <Suspense fallback={<HomeLoading />}>
       <div className={inter.className}>
         <Navbar />
