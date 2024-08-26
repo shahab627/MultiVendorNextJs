@@ -7,7 +7,7 @@ import "leaflet/dist/images/marker-shadow.png";
 import { Dropdown } from "primereact/dropdown";
 import locationIcon from "@/assets/icons/myLocIcon.png";
 import restIcon from "@/assets/icons/restIcon.png";
-import L, { Icon } from "leaflet"; // Import Leaflet and Icon class
+import L, { Icon } from "leaflet";
 import { RESTAURANTS_DATA_SET } from "@/constants/restaurants";
 import { error } from "console";
 

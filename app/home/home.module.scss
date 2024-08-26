@@ -1,14 +1,28 @@
-.spinner {
+.loaderWrapper {
+  position: fixed;
+  z-index: 999999;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(3px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .spinner {
     width: 72px;
     height: 72px;
     border-radius: 50%;
     border: 11.5px solid;
     border-color: #474bff #0000;
     animation: spinner-0tkp9a 1s infinite;
- }
- 
- @keyframes spinner-0tkp9a {
+  }
+
+  @keyframes spinner-0tkp9a {
     to {
-       transform: rotate(.5turn);
+      transform: rotate(0.5turn);
     }
- }
+  }
+}
