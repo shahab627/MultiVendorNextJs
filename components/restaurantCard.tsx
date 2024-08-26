@@ -7,7 +7,7 @@ const RestaurantCard = ({
 }: RestaurantCardProps) => {
   return (
     <div
-      className={`rounded-lg shadow-lg p-4 m-4 ${
+      className={`rounded-lg shadow-lg p-4 m-4 w-1/1 ${
         isDark ? "bg-gray-800 text-white" : "bg-primary text-gray-800"
       }`}
     >

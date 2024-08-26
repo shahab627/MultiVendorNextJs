@@ -36,6 +36,13 @@ const LocationMarker = ({
 
   return null;
 };
+const groupedItemTemplate = (option: any) => {
+  return (
+    <div className="flex align-items-center">
+      <div>{option.optionGroup.name}</div>
+    </div>
+  );
+};
 
 const MapLayout = ({ useStatesProps, functionHandlersProps }: any) => {
   const {
@@ -47,7 +54,7 @@ const MapLayout = ({ useStatesProps, functionHandlersProps }: any) => {
     map,
     setMap,
     myPosition,
-    restaurantList,
+    optionList,
   } = useStatesProps;
 
   const { locateUser, handleNearbyClick, handleFindChange } =
@@ -107,47 +114,54 @@ const MapLayout = ({ useStatesProps, functionHandlersProps }: any) => {
         {nearbyRestaurants.map((restaurant: Restaurant, index: number) => (
           <Marker
             key={index}
-            position={{ lat: restaurant.lat, lng: restaurant.lng }}
+            position={{
+              lat: parseFloat(restaurant.location.coordinates[0]),
+              lng: parseFloat(restaurant.location.coordinates[1]),
+            }}
             icon={customShopIcon}
           >
             <Popup>
               <strong>{restaurant.name}</strong>
               <br />
-              {restaurant.location}
+              {restaurant.address}
             </Popup>
           </Marker>
         ))}
       </MapContainer>
 
+      {/* Controls Section */}
       <div
-        className="fixed top-40 left-20 z-50 p-4 shadow-lg bg-white rounded-md w-100"
+        className="fixed top-40 left-20 z-50 p-4 shadow-lg bg-white rounded-md  max-w-xs md:max-w-3xl"
         style={{ zIndex: 999 }}
       >
-        <div className="flex flex-row space-y-2">
-          {/* Shops Listing  */}
+        <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+          {/* Shops Listing */}
           <Dropdown
             value={selectedOption}
-            options={restaurantList}
+            options={optionList}
             onChange={(e) => handleFindChange(e.value)}
             placeholder="Select Location"
-            className="w-80"
+            className="w-full md:w-80"
             optionLabel="name"
             optionValue="_id"
+            optionGroupChildren="items"
+            optionGroupLabel="name"
+            optionGroupTemplate={groupedItemTemplate}
           />
-          <div className="flex space-x-2 mx-9 ">
+          <div className="flex flex-col space-y-2 md:flex-row md:space-x-2">
+            {/* Nearby Me Button */}
             <button
               onClick={handleNearbyClick}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+              className="bg-blue-500 h-10 my-auto text-white  px-4 py-2 rounded-md hover:bg-blue-600 w-full md:w-auto"
             >
-              Nearby Me
+              Nearby Restaurant
             </button>
-            {/* Locate Me Button  */}
+            {/* Locate Me Button */}
             <button
               onClick={locateUser}
-              className="bg-primary text-white px-4 py-2 rounded-md hover:bg-white hover:text-primary flex items-center"
+              className="bg-transparent  text-primary  px-4 py-2 rounded-md hover:bg-white hover:text-gray-400 flex items-center w-full md:w-auto"
             >
-              <i className="pi pi-map-marker mr-2"></i>
-              Locate Me
+              <i className="pi pi-map-marker text-2xl mr-2"></i>{" "}
             </button>
           </div>
         </div>

@@ -3,15 +3,15 @@ interface Position {
   lng: number;
 }
 
-// interface Restaurant {
-//   name: string;
-//   location: string;
-//   rating: number;
-//   menuItems: string[];
-//   lat: number;
-//   lng: number;
-//   id: number;
-// }
+interface RestaurantSelected {
+  name: string;
+  location: string;
+  rating: number;
+  menuItems: string[];
+  lat: number;
+  lng: number;
+  id: number;
+}
 interface Timings {
   startTime: [string, string];
   endTime: [string, string];

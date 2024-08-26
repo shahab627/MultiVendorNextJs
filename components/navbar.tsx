@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import CompanyLogo from "@/assets/svgs/companyLogo";
 
 const Navbar = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
   return (
     <nav
       className="fixed top-0 left-0 w-full bg-white py-4 px-6 shadow-lg"
@@ -17,15 +19,36 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Login Button */}
-        <div className="flex items-center border-x-2">
+        {/* Breadcrumb for small screens */}
+        <div className="md:hidden">
+          <button
+            onClick={() => setIsMobile(!isMobile)}
+            className="text-black px-4 py-2 rounded font-bold hover:bg-slate-200"
+          >
+            Menu
+          </button>
+        </div>
+
+        {/* Login Button for medium to large screens */}
+        <div className="hidden md:flex items-center border-x-2">
           <Link href="/login">
-            <div className=" text-black px-10 py-2 rounded font-bold hover:bg-slate-200">
+            <div className="text-black px-10 py-2 rounded font-bold hover:bg-slate-200">
               Login
             </div>
           </Link>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobile && (
+        <div className="md:hidden">
+          <Link href="/login">
+            <div className="text-black px-4 py-2 rounded font-bold hover:bg-slate-200">
+              Login
+            </div>
+          </Link>
+        </div>
+      )}
     </nav>
   );
 };
