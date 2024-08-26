@@ -44,7 +44,10 @@ const groupedItemTemplate = (option: any) => {
   );
 };
 
-const MapLayout = ({ useStatesProps, functionHandlersProps }: any) => {
+const MapLayout = ({
+  useStatesProps,
+  functionHandlersProps,
+}: mapComponentProp) => {
   const {
     position,
     setPosition,

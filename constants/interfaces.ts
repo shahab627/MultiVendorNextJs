@@ -40,7 +40,7 @@ interface Category {
 interface ReviewData {
   total: number;
   ratings: number;
-  reviews: any[]; // Adjust this type based on the actual structure of review objects
+  reviews: any[];
   __typename: string;
 }
 
@@ -81,4 +81,9 @@ interface RestaurantCardProps {
 
 interface RestaurantListProps {
   restaurants: Restaurant[];
+}
+
+interface mapComponentProp {
+  useStatesProps: any;
+  functionHandlersProps: any;
 }
